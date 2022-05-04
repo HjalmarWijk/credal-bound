@@ -9,10 +9,13 @@ class ConstraintSet():
     def solve(self, weights, log=0, get_sol=False):
         pass
 
+    def value_at_vertex(self, vert, weights):
+        return sum([pair[0] * pair[1] for pair in zip(weights, vert)])
+
     def solve_once(self, weights, log=0):
         if not self.sol:
             self.sol = self.solve(weights, get_sol=True, log=log)
-        return sum([pair[0] * pair[1] for pair in zip(weights, self.sol)])
+        return self.value_at_vertex(self.sol, weights)
 
 
 class VConstraintSet(ConstraintSet):
@@ -34,23 +37,15 @@ class VConstraintSet(ConstraintSet):
         else:
             self.vertices[index][value] = prob
 
-    def solve_at_vertex(self, vert, weights):
-        return sum([pair[0] * pair[1] for pair in zip(weights, vert)])
-
-    def solve_at_index(self, index, weights):
-        return self.solve_at_vertex(self.vertices[index], weights)
+    def value_at_index(self, index, weights):
+        return self.value_at_vertex(self.vertices[index], weights)
 
     def solve(self, weights, log=0, get_sol=False):
         if not get_sol:
-            return max([self.solve_at_vertex(vert, weights) for vert in self.vertices])
+            return max([self.value_at_vertex(vert, weights) for vert in self.vertices])
         else:
-            return max(self.vertices, key=lambda vertex: self.solve_at_vertex(vertex, weights))
+            return max(self.vertices, key=lambda vertex: self.value_at_vertex(vertex, weights))
 
-    def swap(self):
-        if self.sol == None:
-            print('swap before solved')
-            return False
-        elif self.sol_index == None:
-            self.sol_index = self.vertices.index(self.sol)
-        self.sol_index = (self.sol_index + 1) % len(self.vertices)
-        self.sol = self.vertices[self.sol_index]
+    def set_vertex(self, vertex):
+        assert vertex in self.vertices
+        self.sol = vertex

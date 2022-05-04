@@ -1,28 +1,24 @@
-def lower_bound(nodes, pinst, Const, full_results=False, log=False, ubound=float('inf'),max_steps = 10):
-    for node in nodes:
-        node.stored = None
-    new = [node.eval(pinst, log=log, solve_once=True) for node in nodes]
-    for node in nodes:
-        node.stored = None
+def lower_bound(nodes, indicators, Const, log=False, ubound=float('inf'), max_steps=10):
+    projection = [node.eval(indicators, log=log, solve_once=True) for node in nodes]
     old_best = -1
-    new_best = new[-1]
+    new_best = projection[-1]
     print('First guess is ', new_best)
     for var in Const:
         for constset in var.values():
-            print(constset.name,constset.sol)
-    i=0
-    while new_best > old_best and new_best < ubound and i<max_steps:
+            print(constset.name, constset.sol)
+    i = 0
+    while old_best < new_best < ubound and i < max_steps:
         old_best = new_best
         for var in Const:
             for constraint in var.values():
                 i += 1
-                constraint.swap()
-                new =  [node.eval(pinst, log=log, solve_once=True) for node in nodes]
-                for node in nodes:
-                    node.stored = None
-                if new[-1] > new_best:
-                    new_best = new[-1]
-     #               print('Improved to ', new_best)
-                else:
-                    constraint.swap()
+
+                def solve_with_vert(vert):
+                    constraint.set_vertex(vert)
+                    new = [node.eval(indicators, log=log, solve_once=True) for node in nodes]
+                    return new[-1]
+
+                best_vert = max([(vert, solve_with_vert(vert)) for vert in constraint.vertices], key=lambda k: k[1])
+                constraint.set_vertex(best_vert[0])
+                new_best = best_vert[1]
     return new_best
