@@ -25,7 +25,7 @@ class PartialInstantiation():
 
     def get_var_value(self, var):
         if var not in self.pinst or self.pinst[var] == None:
-            print('Underdetermined pinst access', var, self.pinst[var])
+            print('Underdetermined pinst access', var, self.pinst)
             raise IndexError
         return self.pinst[var]
 

@@ -57,7 +57,7 @@ def read_uai_verts(filename):
 
 def get_constmap(Verts):
     return [{key: constraints_from_verts(vertices, "{}|{}".format(i, ' '.join([str(j) for j in key]))) for
-             (key, vertices) in var.items()} for (i, var) in enumerate(Vert)]
+             (key, vertices) in var.items()} for (i, var) in enumerate(Verts)]
 
 
 def constraints_from_verts(vert_set, name):

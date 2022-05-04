@@ -5,11 +5,11 @@ class ACentry:
             self.id_num = int(ac_string[1])
             self.node_type = 'L'
         if ac_string[0] == 'A':
-            self.child_ids = [int(i) for i in line[2:]]
+            self.child_ids = [int(i) for i in ac_string[2:]]
             self.node_type = 'A'
         if ac_string[0] == 'O':
             self.ind_id = int(ac_string[1])
-            self.child_ids = [int(i) for i in line[3:]]
+            self.child_ids = [int(i) for i in ac_string[3:]]
             self.node_type = 'O'
 
 

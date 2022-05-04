@@ -33,7 +33,7 @@ class Node:
         if not config:
             config = NodeConfig()
         self.init_config(config)
-        return __eval__(indicators, config)
+        return self.__eval__(indicators, config)
 
     def __eval__(self, indicators, config):
         if config.par != self.par:

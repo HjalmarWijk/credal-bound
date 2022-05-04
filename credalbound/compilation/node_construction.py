@@ -6,11 +6,13 @@ class PseudoNode:
     def __init__(self, children, node=None, variable = None):
         if node:
             self.node = node
+            self.id_num = self.node.id_num
         else:
             self.node = None
-        pinsts = [child.pinst for child in children]
+            self.id_num = None
+        self.children = [child for child in children if child]
+        pinsts = [child.pinst for child in self.children]
         self.pinst = PartialInstantiation.Join(pinsts)
-        self.children = children
         self.variable = variable
 
     def __str__(self):
@@ -66,7 +68,7 @@ class NodeConstructor():
         return self.curr_id
 
     def build_sum_node(self, variable, children):
-        pseudonode = PseudoNode(children)
+        pseudonode = PseudoNode(children, variable=variable)
         pseudonode.extend()
         child_nodes = pseudonode.child_nodes
         if len(child_nodes) < self.DomSizes[variable]:
@@ -81,7 +83,7 @@ class NodeConstructor():
             raise
         constraints = self.Constmap[variable][tuple(par_values)]
         try:
-            child_nodes.sort(key=lambda child: child.pinst.get_var_value(variable))
+            pseudonode.children.sort(key=lambda child: child.pinst.get_var_value(variable))
         except IndexError:
             for child in child_nodes:
                 child.print_tree()
@@ -98,17 +100,19 @@ class NodeConstructor():
         if partial_sumnodes:
             partial_sumnodes.sort(key=lambda p: p.variable)
             to_dist = partial_sumnodes[0]
-            children.remove(to_dist)
+            pnode.children.remove(to_dist)
             branches = to_dist.children
             prod_list = []
             for branch in branches:
-                prod_list.append(self.build_prod_node([branch]+children))
+                prod_list.append(self.build_prod_node([branch]+pnode.children))
             return self.build_sum_node(to_dist.variable, prod_list)
-        else:
+        elif pnode.child_nodes:
             node = ProdNode(self.next_id(), pnode.child_nodes)
             self.real_nodes.append(node)
             pnode.attach(node)
             return pnode
+        else:
+            return None
 
     def build_ind_node(self, variable, value):
         node = IndNode(self.next_id(), variable, value)
