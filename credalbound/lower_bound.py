@@ -12,6 +12,8 @@ def lower_bound(nodes, indicators, Const, log=False, ubound=float('inf'), max_st
         for var in Const:
             for constraint in var.values():
                 i += 1
+                if i >= max_steps:
+                    break
 
                 def solve_with_vert(vert):
                     constraint.set_vertex(vert)

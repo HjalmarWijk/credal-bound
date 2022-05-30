@@ -39,11 +39,10 @@ def load_ac(reader: ACReader, node_constructor: NodeConstructor, literals, log =
 
 def compile_SPN(uai_file, lmap_file, ac_file, log = True):
     with open(lmap_file, 'r') as lmap, open(ac_file, 'r') as ac:
-        parents, vertices = read_uai_verts(uai_file)
+        domsizes, parents, vertices = read_uai_verts(uai_file)
         constmap = get_constmap(vertices)
         #print(constmap)
         lmap_reader = LmapReader(lmap)
-        domsizes = lmap_reader.DomSizes
 
         node_constructor = NodeConstructor(constmap, parents, domsizes)
         literals = load_lmap(lmap_reader, node_constructor)
